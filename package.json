@@ -1,0 +1,25 @@
+{
+  "name": "nade404bot",
+  "version": "1.0.0",
+  "description": "Discord bot for Nade404 retake server",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/b4cktr4ck5r3/nade404bot.git"
+  },
+  "author": "backtrack5r3",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/b4cktr4ck5r3/nade404bot/issues"
+  },
+  "homepage": "https://github.com/b4cktr4ck5r3/nade404bot#readme",
+  "devDependencies": {
+    "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "ts-node": "^10.3.0"
+  }
+}
