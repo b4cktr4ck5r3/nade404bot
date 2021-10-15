@@ -13,6 +13,14 @@ const data : SlashCommandSubcommandsOnlyBuilder = new SlashCommandBuilder()
                         .setDescription("Player's SteamID")
                         .setRequired(true))
     )
+    .addSubcommand(subCommandGroup => 
+        subCommandGroup.setName("top10kd")
+                    .setDescription("Retrieve top 10 players based on kd value")
+    )
+    .addSubcommand(subCommandGroup =>
+        subCommandGroup.setName("top10hs")
+                    .setDescription("Retrieve top 10 players based on headshot percent")
+    )
 
 const execute = async (interaction : CommandInteraction) => nade404handler(interaction)
 
