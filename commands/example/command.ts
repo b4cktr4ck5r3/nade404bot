@@ -1,9 +1,10 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
 import { CommandInteraction } from "discord.js";
 
-module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("examplecommand")
-        .setDescription("Description"),
-    execute: async (interaction : CommandInteraction) => { await interaction.reply("example command response") }
-};
+const data : SlashCommandSubcommandsOnlyBuilder = new SlashCommandBuilder()
+    .setName("exampecommand")
+    .setDescription("Description")
+
+const execute = async (interaction : CommandInteraction) => await interaction.reply("example command response")
+
+export { data, execute }
