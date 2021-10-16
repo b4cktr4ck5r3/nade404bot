@@ -1,5 +1,5 @@
 import axios from "axios"
-import { ApiResponse } from "../types/Response"
+import { ApiResponse } from "../types/response"
 
 const apiUrl = 'https://api.nade404.com/api/'
 const apiOptions = {

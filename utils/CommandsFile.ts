@@ -1,4 +1,4 @@
-import { Command } from "../types/Client"
+import { Command } from "../types/client"
 import * as fs from 'fs'
 
 const commandsDir : string[] = fs.readdirSync('./commands') // fs is not relative, so ./ works

@@ -1,7 +1,7 @@
 import { Interaction, Intents, Client, Collection } from "discord.js";
 import { token } from './config.json'
-import { ClientWithCommands, Command } from "./types/Client";
-import { getCommandsAsMap } from "./utils/CommandsFile";
+import { ClientWithCommands, Command } from "./types/client";
+import { getCommandsAsMap } from "./utils/commandsFile";
 
 const fs = require('fs');
 

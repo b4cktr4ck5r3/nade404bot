@@ -1,4 +1,4 @@
-import { getCommandsAsJSON } from './utils/CommandsFile';
+import { getCommandsAsJSON } from './utils/commandsFile';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';

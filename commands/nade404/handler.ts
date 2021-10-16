@@ -1,6 +1,6 @@
 import { CommandInteraction } from "discord.js";
-import { ApiResponse } from "../../types/Response";
-import { getStatsBySteamId, getTop10Hs, getTop10Kd } from "../../utils/Nade404ApiCalls";
+import { ApiResponse } from "../../types/response";
+import { getStatsBySteamId, getTop10Hs, getTop10Kd } from "../../utils/apiCalls";
 
 export const nade404handler = async (interaction: CommandInteraction) : Promise<void> => {
     switch (interaction.options.getSubcommand(true)) {
