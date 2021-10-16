@@ -10,3 +10,7 @@ export interface Player {
     assists: number,
     flash_assists: number
 }
+
+export interface Players {
+    players: Player[]
+}

@@ -1,7 +1,7 @@
-import { Player } from './player'
+import { Player, Players } from './player'
 
 export interface ApiResponse {
     message: string,
-    players: Player | Player[],
+    players: Player | Players,
     success: boolean
 }
