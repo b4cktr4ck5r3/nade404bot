@@ -9,7 +9,9 @@ import { getStatsTemplate, getTop10Template } from "./template";
 export const nade404handler = async (interaction: CommandInteraction) : Promise<void> => {
     switch (interaction.options.getSubcommand(true)) {
         case 'stats': {
-            const steamId = interaction.options.getString('steamid', true);
+            let steamId : string = interaction.options.getString('steamid', true);
+            if (steamId.startsWith("STEAM_0")) steamId = steamId.replace("STEAM_0", "STEAM_1")
+
             const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
             if (success) interaction.reply({ embeds: [getStatsTemplate(players as Player)] })
             else interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Cannot get stats")] })
