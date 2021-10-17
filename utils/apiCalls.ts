@@ -1,8 +1,8 @@
 import axios from "axios"
-import { ApiResponse } from "../types/response"
+import { ApiResponse, ApiRoutes } from "../types/response"
 
 const apiUrl : string = 'https://api.nade404.com/api/'
-const apiOptions = {
+const apiOptions : ApiRoutes = {
     players : 'players/',
     top10kd : 'top10kd/',
     top10hs : 'top10hs/'
