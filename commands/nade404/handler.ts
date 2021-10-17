@@ -9,9 +9,9 @@ import { getErrorTemplate } from "../../utils/template";
 import { getStatsTemplate, getTop10Template } from "./template";
 
 // TODO : upgrade nested switch by replacing with function (better readability)
-export const nade404handler = async (interaction: CommandInteraction) : Promise<void> => {
-    const subCommandGroup = interaction.options.getSubcommandGroup(false);
-    const subCommand = interaction.options.getSubcommand(false);
+export const nade404handler : Function = async (interaction: CommandInteraction) : Promise<void> => {
+    const subCommandGroup : string | null = interaction.options.getSubcommandGroup(false);
+    const subCommand : string | null = interaction.options.getSubcommand(false);
 
     if (subCommandGroup != null){
         switch (subCommandGroup) {
@@ -27,8 +27,8 @@ export const nade404handler = async (interaction: CommandInteraction) : Promise<
                         break;
                     }
                     case 'discord': {
-                        const discordId = interaction.options.getUser('user', true).id;
-                        const steamId = await userQuery.getUser(discordId).then(user => user?.steamId);
+                        const discordId : string = interaction.options.getUser('user', true).id;
+                        const steamId : string | null | undefined = await userQuery.getUser(discordId).then(user => user?.steamId);
                         if (steamId) {
                             FormatSteamId(steamId);
 
@@ -59,8 +59,8 @@ export const nade404handler = async (interaction: CommandInteraction) : Promise<
                 break;            
             }
             case 'me' : {
-                const discordId = interaction.user.id;
-                let steamId = await userQuery.getUser(discordId).then(user => user?.steamId);
+                const discordId : string = interaction.user.id;
+                let steamId : string | null | undefined = await userQuery.getUser(discordId).then(user => user?.steamId);
                 if (steamId) {
                     FormatSteamId(steamId);
                     const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
@@ -72,11 +72,11 @@ export const nade404handler = async (interaction: CommandInteraction) : Promise<
                 break;
             }
             case 'register' : {
-                const discordId = interaction.user.id;
+                const discordId : string = interaction.user.id;
                 let steamId : string = interaction.options.getString('steamid', true);
                 FormatSteamId(steamId);
 
-                const register = await userQuery.addUser({discordId:discordId, steamId:steamId});
+                const register : boolean = await userQuery.addUser({discordId:discordId, steamId:steamId});
                 if (register) interaction.reply("Successfully registered.");
                 else interaction.reply("You are already registered !");
             }

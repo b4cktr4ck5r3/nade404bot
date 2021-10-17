@@ -5,8 +5,8 @@ import { Routes } from 'discord-api-types/v9';
 import { clientId, guildId, token } from './config.json';
 import * as fs from 'fs';
 
-async function deployCommands() {
-	const rest = new REST({ version: '9' }).setToken(token);
+async function deployCommands() : Promise<void> {
+	const rest : REST = new REST({ version: '9' }).setToken(token);
 
 	console.log('Started refreshing application (/) commands.');
 

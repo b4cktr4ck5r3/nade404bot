@@ -2,10 +2,10 @@ import { ColorResolvable, MessageEmbed } from "discord.js";
 import { Player, Players } from "../../types/player";
 import { Top10Type } from "../../types/top10";
 
-export function getStatsTemplate(player : Player) {
+export function getStatsTemplate(player : Player) : MessageEmbed {
     const color : ColorResolvable = player.ratio > 1 ? 'GREEN' : 'RED';
 
-    const template = new MessageEmbed()
+    const template : MessageEmbed = new MessageEmbed()
     .setColor(color)
     .setTitle(`Stats of ${player.name}`)
     .setDescription('Retrieved from nade404 retake servers')
@@ -20,10 +20,10 @@ export function getStatsTemplate(player : Player) {
     return template;
 }
 
-export function getTop10Template(players : Players, type : Top10Type) {
-    let title = "";
+export function getTop10Template(players : Players, type : Top10Type) : MessageEmbed {
+    let title : string = "";
     let prop : keyof Player;
-    let symbol = ""; 
+    let symbol :string = ""; 
 
     switch (type) {
         case Top10Type.HS:
@@ -47,7 +47,7 @@ export function getTop10Template(players : Players, type : Top10Type) {
         }
     });
 
-    const template = new MessageEmbed()
+    const template : MessageEmbed = new MessageEmbed()
     .setColor('GREEN')
     .setTitle(`Top 10 by ${title}`)
     .setDescription('Retrieved from nade404 retake servers')

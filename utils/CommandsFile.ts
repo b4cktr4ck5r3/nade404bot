@@ -3,7 +3,7 @@ import * as fs from 'fs'
 
 const commandsDir : string[] = fs.readdirSync('./commands') // fs is not relative, so ./ works
 
-export async function getCommandsAsJSON() {
+export async function getCommandsAsJSON() : Promise<ReturnType<Command["data"]["toJSON"]>[]>{
 	const commandsAsJSON: ReturnType<Command["data"]["toJSON"]>[] = [];
 	for (const dir of commandsDir) {
 		const commandData : CommandData = await import(`../commands/${dir}/command.data`); // import is relative, so need ../
@@ -13,7 +13,7 @@ export async function getCommandsAsJSON() {
 	return commandsAsJSON;
 }
 
-export async function getCommandsAsMap() {
+export async function getCommandsAsMap() : Promise<Map<string, Command>> {
 	const commandsAsMap: Map<string, Command> = new Map<string, Command>();
 	for (const dir of commandsDir) {
 		const commandData : CommandData = await import(`../commands/${dir}/command.data`) // import is relative, so need ../

@@ -1,7 +1,7 @@
 import axios from "axios"
 import { ApiResponse } from "../types/response"
 
-const apiUrl = 'https://api.nade404.com/api/'
+const apiUrl : string = 'https://api.nade404.com/api/'
 const apiOptions = {
     players : 'players/',
     top10kd : 'top10kd/',

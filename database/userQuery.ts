@@ -17,12 +17,12 @@ class UserQuery {
     }
 
     async addUser(user : User) : Promise<boolean> {
-        const alreadyExist = Boolean(
+        const alreadyExist : boolean = Boolean(
             await this.model.findOne({ discordId : user.discordId }).lean()
         );
 
         if (!alreadyExist) {
-            const document = await this.model.create(user);
+            const document : USER_DOC = await this.model.create(user);
             if (document) return true;
         }
 
@@ -30,7 +30,7 @@ class UserQuery {
     }
 
     async getUser(discordId : string) : Promise<User | null> {
-        const document = await this.model
+        const document : USER_DOC = await this.model
             .findOne({discordId : discordId})
             .lean()
 

@@ -14,7 +14,7 @@ class Database {
     })
   }
 
-  getDatabase() {
+  getDatabase() : Mongoose {
     return this.db;
   }
 }
