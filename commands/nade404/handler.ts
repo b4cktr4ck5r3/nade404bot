@@ -27,7 +27,17 @@ export const nade404handler = async (interaction: CommandInteraction) : Promise<
                         break;
                     }
                     case 'discord': {
-                        interaction.reply("Under development");
+                        const discordId = interaction.options.getUser('user', true).id;
+                        const steamId = await userQuery.getUser(discordId).then(user => user?.steamId);
+                        if (steamId) {
+                            FormatSteamId(steamId);
+
+                            const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
+                            if (success) interaction.reply({ embeds: [getStatsTemplate(players as Player)] })
+                            else interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Cannot get stats")] })
+                        } else {
+                            interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Player not registered")] })
+                        }
                         break;
                     }
                 }

@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, SlashCommandStringOption, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder, SlashCommandStringOption, SlashCommandSubcommandsOnlyBuilder, SlashCommandUserOption } from "@discordjs/builders";
 import { CommandInteraction, Options } from "discord.js";
 import { nade404handler } from "./handler";
 
@@ -34,8 +34,8 @@ export const data : SlashCommandSubcommandsOnlyBuilder = new SlashCommandBuilder
         .addSubcommand(subCommand => 
             subCommand.setName("discord")
                         .setDescription("Retrieve stats for discord user")
-                        .addStringOption((options : SlashCommandStringOption) =>
-                            options.setName("discord")
+                        .addUserOption((options : SlashCommandUserOption) => 
+                            options.setName("user")
                             .setDescription("Player's Discord")
                             .setRequired(true))
         )
