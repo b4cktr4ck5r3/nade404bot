@@ -2,7 +2,7 @@ import { SlashCommandBuilder, SlashCommandStringOption, SlashCommandSubcommandsO
 import { CommandInteraction, Options } from "discord.js";
 import { nade404handler } from "./handler";
 
-const data : SlashCommandSubcommandsOnlyBuilder = new SlashCommandBuilder()
+export const data : SlashCommandSubcommandsOnlyBuilder = new SlashCommandBuilder()
     .setName("nade404")
     .setDescription("Ask for Nade404 stats")
     .addSubcommand(subCommand =>
@@ -40,7 +40,3 @@ const data : SlashCommandSubcommandsOnlyBuilder = new SlashCommandBuilder()
                             .setRequired(true))
         )
     )
-
-const execute = async (interaction : CommandInteraction) => nade404handler(interaction)
-
-export { data, execute }

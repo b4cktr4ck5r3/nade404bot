@@ -10,7 +10,7 @@ async function deployCommands() {
 
 	console.log('Started refreshing application (/) commands.');
 
-	rest.put(
+	await rest.put(
 		Routes.applicationGuildCommands(clientId, guildId), {
 			body: await getCommandsAsJSON()
 		})
@@ -18,4 +18,4 @@ async function deployCommands() {
 		.catch(console.error);
 }
 
-deployCommands();
+deployCommands().then(() => console.log("script done"));

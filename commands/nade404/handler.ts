@@ -1,8 +1,10 @@
 import { CommandInteraction } from "discord.js";
+import userQuery from "../../database/userQuery";
 import { Player, Players } from "../../types/player";
 import { ApiResponse } from "../../types/response";
 import { Top10Type } from "../../types/top10";
 import { getStatsBySteamId, getTop10Hs, getTop10Kd } from "../../utils/apiCalls";
+import { FormatSteamId } from "../../utils/steam";
 import { getErrorTemplate } from "../../utils/template";
 import { getStatsTemplate, getTop10Template } from "./template";
 
@@ -17,8 +19,8 @@ export const nade404handler = async (interaction: CommandInteraction) : Promise<
                 switch (subCommand) {
                     case 'steam': {
                         let steamId : string = interaction.options.getString('steamid', true);
-                        if (steamId.startsWith("STEAM_0")) steamId = steamId.replace("STEAM_0", "STEAM_1")
-            
+                        FormatSteamId(steamId);
+           
                         const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
                         if (success) interaction.reply({ embeds: [getStatsTemplate(players as Player)] })
                         else interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Cannot get stats")] })
@@ -47,7 +49,26 @@ export const nade404handler = async (interaction: CommandInteraction) : Promise<
                 break;            
             }
             case 'me' : {
-                interaction.reply(JSON.stringify(interaction.user.username));
+                const discordId = interaction.user.id;
+                let steamId = await userQuery.getUser(discordId).then(user => user?.steamId);
+                if (steamId) {
+                    FormatSteamId(steamId);
+                    const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
+                    if (success) interaction.reply({ embeds: [getStatsTemplate(players as Player)] })
+                    else interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Cannot get stats")] })
+                } else {
+                    interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Cannot get stats")] })
+                }
+                break;
+            }
+            case 'register' : {
+                const discordId = interaction.user.id;
+                let steamId : string = interaction.options.getString('steamid', true);
+                FormatSteamId(steamId);
+
+                const register = await userQuery.addUser({discordId:discordId, steamId:steamId});
+                if (register) interaction.reply("Successfully registered.");
+                else interaction.reply("You are already registered !");
             }
         }
     }
