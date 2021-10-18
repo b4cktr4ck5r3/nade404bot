@@ -18,8 +18,7 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
             case 'stats': {
                 switch (subCommand) {
                     case 'steam': {
-                        let steamId : string = interaction.options.getString('steamid', true);
-                        FormatSteamId(steamId);
+                        let steamId : string = FormatSteamId(interaction.options.getString('steamid', true));
            
                         const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
                         if (success) interaction.reply({ embeds: [getStatsTemplate(players as Player)] })
@@ -28,10 +27,8 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
                     }
                     case 'discord': {
                         const discordId : string = interaction.options.getUser('user', true).id;
-                        const steamId : string | null | undefined = await userQuery.getUser(discordId).then(user => user?.steamId);
+                        const steamId : string | null | undefined = FormatSteamId(await userQuery.getUser(discordId).then(user => user?.steamId));
                         if (steamId) {
-                            FormatSteamId(steamId);
-
                             const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
                             if (success) interaction.reply({ embeds: [getStatsTemplate(players as Player)] })
                             else interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Cannot get stats")] })
@@ -60,9 +57,8 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
             }
             case 'me' : {
                 const discordId : string = interaction.user.id;
-                let steamId : string | null | undefined = await userQuery.getUser(discordId).then(user => user?.steamId);
+                let steamId : string | null | undefined = FormatSteamId(await userQuery.getUser(discordId).then(user => user?.steamId));
                 if (steamId) {
-                    FormatSteamId(steamId);
                     const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
                     if (success) interaction.reply({ embeds: [getStatsTemplate(players as Player)] })
                     else interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Cannot get stats")] })
@@ -73,8 +69,7 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
             }
             case 'register' : {
                 const discordId : string = interaction.user.id;
-                let steamId : string = interaction.options.getString('steamid', true);
-                FormatSteamId(steamId);
+                let steamId : string = FormatSteamId(interaction.options.getString('steamid', true));
 
                 const register : boolean = await userQuery.addUser({discordId:discordId, steamId:steamId});
                 if (register) interaction.reply("Successfully registered.");
