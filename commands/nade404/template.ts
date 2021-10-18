@@ -16,6 +16,7 @@ export function getStatsTemplate(player : Player) : MessageEmbed {
         { name: `${player.ratio > 1 ? '📈' : '📉'} Ratio`, value: `${player.ratio}`, inline: true },
         { name: '🤯 Headshots', value: `${player.headshots}`, inline: true },
         { name: '💥 Headshot %', value: `${player.headshots_percent}%`, inline: true },
+        { name: '🏆 Rank Nade404', value: `${player.rank}`, inline: true }
     )
     .setFooter(`Generate the ${getCurrentFormatedDate()}`)
 
