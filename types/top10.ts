@@ -7,5 +7,5 @@ export enum Top10Type {
 
 export interface Top10 {
     type: Top10Type
-    request : any // TODO : replace any
+    request: () => Promise<ApiResponse>
 }
