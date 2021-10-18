@@ -6,6 +6,11 @@ import { Top10Type } from "../../types/top10";
 import { getStatsBySteamId, getTop10Hs, getTop10Kd } from "../../utils/apiCalls";
 import { FormatSteamId } from "../../utils/steam";
 import { getErrorTemplate } from "../../utils/template";
+import { subCmdMe } from "./subcommands/me";
+import { subCmdRegister } from "./subcommands/register";
+import { subCmdStatsDiscord } from "./subcommands/stats.discord";
+import { subCmdStatsSteam } from "./subcommands/stats.steam";
+import { subCmdTop10 } from "./subcommands/top10hs";
 import { getStatsTemplate, getTop10Template } from "./template";
 
 // TODO : upgrade nested switch by replacing with function (better readability)
@@ -17,26 +22,12 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
         switch (subCommandGroup) {
             case 'stats': {
                 switch (subCommand) {
-                    case 'steam': {
-                        let steamId : string = FormatSteamId(interaction.options.getString('steamid', true));
-           
-                        const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
-                        if (success) interaction.reply({ embeds: [getStatsTemplate(players as Player)] })
-                        else interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Cannot get stats")] })
+                    case 'steam':
+                        subCmdStatsSteam(interaction);
                         break;
-                    }
-                    case 'discord': {
-                        const discordId : string = interaction.options.getUser('user', true).id;
-                        const steamId : string | null | undefined = FormatSteamId(await userQuery.getUser(discordId).then(user => user?.steamId));
-                        if (steamId) {
-                            const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
-                            if (success) interaction.reply({ embeds: [getStatsTemplate(players as Player)] })
-                            else interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Cannot get stats")] })
-                        } else {
-                            interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Player not registered")] })
-                        }
+                    case 'discord':
+                        subCmdStatsDiscord(interaction);
                         break;
-                    }
                 }
                 break;
             }
@@ -54,27 +45,13 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
                 if (success) interaction.reply({ embeds: [getTop10Template(players as Players, Top10Type.KD)] });
                 else interaction.reply({ embeds: [getErrorTemplate("Error on getting top 10 K/D", "Cannot get top 10 K/D")] })
                 break;            
-            }
-            case 'me' : {
-                const discordId : string = interaction.user.id;
-                let steamId : string | null | undefined = FormatSteamId(await userQuery.getUser(discordId).then(user => user?.steamId));
-                if (steamId) {
-                    const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
-                    if (success) interaction.reply({ embeds: [getStatsTemplate(players as Player)] })
-                    else interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Cannot get stats")] })
-                } else {
-                    interaction.reply({ embeds: [getErrorTemplate("Error on getting stats", "Cannot get stats")] })
-                }
+            }      
+            case 'me' :
+                subCmdMe(interaction);
                 break;
-            }
-            case 'register' : {
-                const discordId : string = interaction.user.id;
-                let steamId : string = FormatSteamId(interaction.options.getString('steamid', true));
-
-                const register : boolean = await userQuery.addUser({discordId:discordId, steamId:steamId});
-                if (register) interaction.reply("Successfully registered.");
-                else interaction.reply("You are already registered !");
-            }
+            case 'register' :
+                subCmdRegister(interaction);
+                break;
         }
     }
 }
