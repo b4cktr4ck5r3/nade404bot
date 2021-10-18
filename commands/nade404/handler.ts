@@ -1,17 +1,7 @@
+import * as subCmd from "./subcommands"
 import { CommandInteraction } from "discord.js";
-import userQuery from "../../database/userQuery";
-import { Player, Players } from "../../types/player";
-import { ApiResponse } from "../../types/response";
-import { Top10, Top10Type } from "../../types/top10";
-import { getStatsBySteamId, getTop10Hs, getTop10Kd } from "../../utils/apiCalls";
-import { FormatSteamId } from "../../utils/steam";
-import { getErrorTemplate } from "../../utils/template";
-import { subCmdMe } from "./subcommands/me";
-import { subCmdRegister } from "./subcommands/register";
-import { subCmdStatsDiscord } from "./subcommands/stats.discord";
-import { subCmdStatsSteam } from "./subcommands/stats.steam";
-import { subCmdTop10 } from "./subcommands/top10";
-import { getStatsTemplate, getTop10Template } from "./template";
+import { Top10Type } from "../../types/top10";
+import { getTop10Hs, getTop10Kd } from "../../utils/apiCalls";
 
 // TODO : upgrade nested switch by replacing with function (better readability)
 export const nade404handler : Function = async (interaction: CommandInteraction) : Promise<void> => {
@@ -23,10 +13,10 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
             case 'stats': {
                 switch (subCommand) {
                     case 'steam':
-                        subCmdStatsSteam(interaction);
+                        subCmd.subCmdStatsSteam(interaction);
                         break;
                     case 'discord':
-                        subCmdStatsDiscord(interaction);
+                        subCmd.subCmdStatsDiscord(interaction);
                         break;
                 }
                 break;
@@ -34,19 +24,17 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
         }
     } else {
         switch (subCommand) {
-            case 'top10hs': {
-                subCmdTop10(interaction, { type: Top10Type.HS, request() { return getTop10Hs() }})
+            case 'top10hs': 
+                subCmd.subCmdTop10(interaction, { type: Top10Type.HS, request() { return getTop10Hs() }})
                 break;
-            }
-            case 'top10kd': {
-                subCmdTop10(interaction, { type: Top10Type.KD, request() { return getTop10Kd() }})
+            case 'top10kd':
+                subCmd.subCmdTop10(interaction, { type: Top10Type.KD, request() { return getTop10Kd() }})
                 break;            
-            }      
             case 'me' :
-                subCmdMe(interaction);
+                subCmd.subCmdMe(interaction);
                 break;
             case 'register' :
-                subCmdRegister(interaction);
+                subCmd.subCmdRegister(interaction);
                 break;
         }
     }
