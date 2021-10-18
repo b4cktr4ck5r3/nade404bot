@@ -2,13 +2,18 @@ import { ColorResolvable, MessageEmbed } from "discord.js";
 import { Player, Players } from "../../types/player";
 import { Top10Type } from "../../types/top10";
 import { getCurrentFormatedDate } from "../../utils/date";
+import { getSteamInfos } from "../../utils/steam";
 
-export function getStatsTemplate(player : Player) : MessageEmbed {
+export async function getStatsTemplate(player : Player) : Promise<MessageEmbed> {
     const color : ColorResolvable = player.ratio > 1 ? 'GREEN' : 'RED';
-
+    const { response : { players}} =  await getSteamInfos(player.steam_id);
+    let steamInfos;
+    if (players) steamInfos = players[0]
+    else steamInfos = null;
     const template : MessageEmbed = new MessageEmbed()
     .setColor(color)
     .setTitle(`📊 Stats of ${player.name}`)
+    .setThumbnail(steamInfos === null ? '' : steamInfos.avatarmedium)
     .setDescription('Retrieved from nade404 retake servers')
     .addFields(
 		{ name: '🔫 Kills', value: `${player.kills}`, inline: true },
