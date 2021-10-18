@@ -13,10 +13,10 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
             case 'stats': {
                 switch (subCommand) {
                     case 'steam':
-                        subCmd.subCmdStatsSteam(interaction);
+                        subCmd.statsSteam(interaction);
                         break;
                     case 'discord':
-                        subCmd.subCmdStatsDiscord(interaction);
+                        subCmd.statsDiscord(interaction);
                         break;
                 }
                 break;
@@ -25,16 +25,16 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
     } else {
         switch (subCommand) {
             case 'top10hs': 
-                subCmd.subCmdTop10(interaction, { type: Top10Type.HS, request() { return getTop10Hs() }})
+                subCmd.top10(interaction, { type: Top10Type.HS, request() { return getTop10Hs() }})
                 break;
             case 'top10kd':
-                subCmd.subCmdTop10(interaction, { type: Top10Type.KD, request() { return getTop10Kd() }})
+                subCmd.top10(interaction, { type: Top10Type.KD, request() { return getTop10Kd() }})
                 break;            
             case 'me' :
-                subCmd.subCmdMe(interaction);
+                subCmd.me(interaction);
                 break;
             case 'register' :
-                subCmd.subCmdRegister(interaction);
+                subCmd.register(interaction);
                 break;
         }
     }
