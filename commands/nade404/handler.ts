@@ -36,6 +36,9 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
             case 'register' :
                 subCmd.register(interaction);
                 break;
+            case 'change_steam_id':
+                subCmd.changeSteamId(interaction);
+                break;
         }
     }
 }

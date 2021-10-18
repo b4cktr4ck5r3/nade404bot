@@ -1,4 +1,4 @@
 export * from "./me";
-export * from "./register";
+export * from "./account";
 export * from "./stats";
 export * from "./top10";

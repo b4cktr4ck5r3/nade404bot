@@ -37,6 +37,18 @@ class UserQuery {
         if (document) return document;
         else return null;
     }
+
+    async updateUser(user : User) : Promise<boolean> {
+        const userExists : User | null = await this.getUser(user.discordId)
+
+        if (userExists) {
+            const document : USER_DOC = await this.model
+            .updateOne({discordId:user.discordId}, {steamId:user.steamId})
+            .lean()
+
+            return true;
+        } else return false;
+    }
 }
 
 export default new UserQuery();
