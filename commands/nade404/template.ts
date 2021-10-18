@@ -16,12 +16,12 @@ export async function getStatsTemplate(player : Player) : Promise<MessageEmbed> 
     .setThumbnail(steamInfos === null ? '' : steamInfos.avatarmedium)
     .setDescription('Retrieved from nade404 retake servers')
     .addFields(
+        { name: '🏆 Rank', value: `${player.rank}` },
 		{ name: '🔫 Kills', value: `${player.kills}`, inline: true },
         { name: '💀 Deaths', value: `${player.deaths}`, inline: true},
-        { name: `${player.ratio > 1 ? '📈' : '📉'} Ratio`, value: `${player.ratio}`, inline: true },
+        { name: `${player.ratio > 1 ? '📈' : '📉'} Ratio`, value: `${player.ratio.toFixed(2)}`, inline: true },
         { name: '🤯 Headshots', value: `${player.headshots}`, inline: true },
-        { name: '💥 Headshot %', value: `${player.headshots_percent}%`, inline: true },
-        { name: '🏆 Rank Nade404', value: `${player.rank}`, inline: true }
+        { name: '💥 Headshot %', value: `${player.headshots_percent}%`, inline: true }
     )
     .setFooter(`Generate the ${getCurrentFormatedDate()}`)
 
@@ -64,7 +64,7 @@ export function getTop10Template(players : Players, type : Top10Type) : MessageE
     const fields = players.players.map((player, index) => {
         return {
             name : `${top10classement[index].icon} ${index+1}${top10classement[index].abbr} place`,
-            value : `${player.name} (${player[prop]}${symbol} with ${player.kills} kills)`
+            value : `${player.name} (${prop === "ratio" ? (player[prop] as number).toFixed(2) : player[prop]}${symbol} with ${player.kills} kills)`
         }
     });
 
