@@ -3,8 +3,6 @@ import { token } from './config.json'
 import { ClientWithCommands, Command } from "./types/client";
 import { getCommandsAsMap } from "./utils/commandsFile";
 
-const fs = require('fs');
-
 async function main() {
 	const client : ClientWithCommands = new Client({ intents: [Intents.FLAGS.GUILDS] });
 	client.commands = await getCommandsAsMap();
