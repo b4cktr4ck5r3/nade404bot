@@ -1,0 +1,10 @@
+{
+    "clientId":"",
+    "guildId":"",
+    "token":"",
+    "mongoUri":"",
+    "mongoDb":"",
+    "mongoUser":"",
+    "mongoPass":"",
+    "steamKey":""
+}
