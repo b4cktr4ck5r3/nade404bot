@@ -47,3 +47,10 @@ export const data : SlashCommandSubcommandsOnlyBuilder = new SlashCommandBuilder
                             .setRequired(true))
         )
     )
+    .addSubcommandGroup(subCommandGroup => 
+        subCommandGroup.setName("lobby").setDescription("Handle lobbies")
+        .addSubcommand(subCommand => 
+            subCommand.setName("create")
+            .setDescription("Create lobby")
+        )
+    )

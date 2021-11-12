@@ -21,6 +21,13 @@ export const nade404handler : Function = async (interaction: CommandInteraction)
                 }
                 break;
             }
+            case 'lobby': {
+                switch (subCommand) {
+                    case 'create':
+                        subCmd.createLobby(interaction);
+                        break;
+                }
+            }
         }
     } else {
         switch (subCommand) {
