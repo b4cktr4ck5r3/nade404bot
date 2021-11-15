@@ -12,7 +12,14 @@ export interface ApiRoutes {
     top10hs : string
 }
 
-export interface SteamResponse {
+export interface SteamResolveVanityResponse {
+    response: {
+        steamid: string,
+        success: number
+    }
+}
+
+export interface SteamSummaryResponse {
     response : {
         players : SteamPlayer[]
 
