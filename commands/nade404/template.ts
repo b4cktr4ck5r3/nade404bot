@@ -1,4 +1,5 @@
-import { ColorResolvable, MessageEmbed } from "discord.js";
+import { ColorResolvable, EmbedFieldData, MessageEmbed } from "discord.js";
+import { LobbyConfiguration } from "../../types/lobby";
 import { Player, Players } from "../../types/player";
 import { Top10Type } from "../../types/top10";
 import { getCurrentFormatedDate } from "../../utils/date";
@@ -76,4 +77,32 @@ export function getTop10Template(players : Players, type : Top10Type) : MessageE
     .setFooter(`Generate on ${getCurrentFormatedDate()}`)
 
     return template;
+}
+
+export function getCreateLobbyTemplate(lobbyConfiguration : LobbyConfiguration) : MessageEmbed {
+    const color : ColorResolvable = "RANDOM"
+    const fields : EmbedFieldData | EmbedFieldData[] = Object.entries(lobbyConfiguration)
+    .filter(([name, value]) => value !== null)
+    .map(([name, value]) => {
+        convertPropertyNameToField(name);
+        return {name, value : String(value) }
+    });
+
+    const template : MessageEmbed = new MessageEmbed()
+    .setColor(color)
+    .setTitle(`📊 Creation of the lobby`)
+    .setDescription('Configuring lobby')
+    .addFields(fields)
+    .setFooter(`Generate the ${getCurrentFormatedDate()}`)
+
+    return template;
+}
+
+function convertPropertyNameToField(name: string): void {
+    switch (name) {
+        case 'KnifeEnabled':
+            name = 'Knife enabled';
+        case 'MRType':
+            name = 'MR Type';
+    }
 }

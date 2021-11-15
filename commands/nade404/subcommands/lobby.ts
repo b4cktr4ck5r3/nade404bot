@@ -1,9 +1,10 @@
 import { APIMessage } from "discord-api-types";
 import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageComponentInteraction, MessageSelectMenu, Options, SelectMenuInteraction } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
-import { REGISTRATION_STEP } from "../../../types/lobby";
+import { LobbyConfiguration, MR_TYPE, PRIVACY, REGISTRATION_STEP } from "../../../types/lobby";
 import { SelectMenuConfiguration } from "../../../types/selectMenu";
 import { getButtonActionRow, getErrorTemplate, getSelectActionRow } from "../../../utils/template";
+import { getCreateLobbyTemplate } from "../template";
 
 const PRIVACY_MENU : SelectMenuConfiguration = {
     placeholder: 'Please select game privacy',
@@ -71,6 +72,13 @@ const OVERTIME_MENU : SelectMenuConfiguration = {
 
 export async function createLobby(interaction: CommandInteraction) {
     let registrationStep : REGISTRATION_STEP = REGISTRATION_STEP.PRIVACY
+    let lobbyConfiguration : LobbyConfiguration = {
+        Privacy: null,
+        KnifeEnabled: null,
+        MRType: null,
+        Overtime: null
+    }
+
     const memberId = interaction.user.id;
 
     const backButton = getButtonActionRow('back', 'Back', MessageButtonStyles.PRIMARY, true);
@@ -78,8 +86,9 @@ export async function createLobby(interaction: CommandInteraction) {
 
     interaction.reply(
         { 
-            embeds: [getErrorTemplate("TEST", "Description")],
-            components: [selectMenu, backButton]
+            embeds: [getCreateLobbyTemplate(lobbyConfiguration)],
+            components: [selectMenu, backButton],
+            ephemeral: true
         }
     )
 
@@ -93,21 +102,25 @@ export async function createLobby(interaction: CommandInteraction) {
                 if (interaction.componentType === 'SELECT_MENU') {
                     switch(registrationStep) {
                         case REGISTRATION_STEP.PRIVACY : {
-                            updateInteraction(interaction, backButton, selectMenu, KNIFE_MENU, false);
+                            lobbyConfiguration.Privacy = interaction.values[0] as PRIVACY
+                            updateInteraction(interaction, backButton, selectMenu, KNIFE_MENU, false, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.KNIFE;
                             break;
                         }
                         case REGISTRATION_STEP.KNIFE : {
-                            updateInteraction(interaction, backButton, selectMenu, ROUNDS_MENU, false);
+                            lobbyConfiguration.KnifeEnabled = (interaction.values[0] === 'knife_on')
+                            updateInteraction(interaction, backButton, selectMenu, ROUNDS_MENU, false, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.MR;
                             break;
                         }
                         case REGISTRATION_STEP.MR : {
-                            updateInteraction(interaction, backButton, selectMenu, OVERTIME_MENU, false);
+                            lobbyConfiguration.MRType = interaction.values[0] as MR_TYPE
+                            updateInteraction(interaction, backButton, selectMenu, OVERTIME_MENU, false, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.OVERTIME;
                             break;
                         }
                         case REGISTRATION_STEP.OVERTIME : {
+                            lobbyConfiguration.Overtime = (interaction.values[0] === 'overtime_yes')
                             interaction.channel?.send("ENDED");
                             interaction.update({
                                 components: []
@@ -121,25 +134,28 @@ export async function createLobby(interaction: CommandInteraction) {
                 if (interaction.componentType === 'BUTTON') {
                     switch(registrationStep) {
                         case REGISTRATION_STEP.KNIFE: {
-                            updateInteraction(interaction, backButton, selectMenu, PRIVACY_MENU, true);
-                            console.log("RETURN TO PRIVACY")
+                            lobbyConfiguration.Privacy = null;
+                            updateInteraction(interaction, backButton, selectMenu, PRIVACY_MENU, true, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.PRIVACY
                             break;
                         }
                         case REGISTRATION_STEP.MR : {
-                            updateInteraction(interaction, backButton, selectMenu, KNIFE_MENU, false);
-                            console.log("RETURN TO KNIFE")
+                            lobbyConfiguration.MRType = null;
+                            lobbyConfiguration.KnifeEnabled = null;
+                            updateInteraction(interaction, backButton, selectMenu, KNIFE_MENU, false, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.KNIFE;
                             break;
                         }
                         case REGISTRATION_STEP.OVERTIME : {
-                            updateInteraction(interaction, backButton, selectMenu, ROUNDS_MENU, false);
-                            console.log("RETURN TO MR")
+                            lobbyConfiguration.Overtime = null;
+                            lobbyConfiguration.MRType = null;
+                            updateInteraction(interaction, backButton, selectMenu, ROUNDS_MENU, false, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.MR;
                             break;
                         }
                     }                    
                 }
+
                 if (registrationStep === REGISTRATION_STEP.ENDED)
                 {
                     interaction.channel?.send("done");
@@ -150,12 +166,13 @@ export async function createLobby(interaction: CommandInteraction) {
     }    
 }
 
-function updateInteraction (interaction : SelectMenuInteraction | ButtonInteraction, button : MessageActionRow, selectMenu : MessageActionRow, selectMenuConfiguration : SelectMenuConfiguration, disableButton : boolean) {
+function updateInteraction (interaction : SelectMenuInteraction | ButtonInteraction, button : MessageActionRow, selectMenu : MessageActionRow, selectMenuConfiguration : SelectMenuConfiguration, disableButton : boolean, lobbyConfiguration: LobbyConfiguration) {
     (button.components[0] as MessageButton).setDisabled(disableButton);
     const { placeholder, options } = selectMenuConfiguration;
     (selectMenu.components[0] as MessageSelectMenu).setPlaceholder(placeholder).setOptions(options);
 
     interaction.update({
+        embeds: [getCreateLobbyTemplate(lobbyConfiguration)],
         components: [selectMenu, button]
     });
 }
