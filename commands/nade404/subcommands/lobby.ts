@@ -1,10 +1,15 @@
+import { formatEmoji } from "@discordjs/builders";
 import { APIMessage } from "discord-api-types";
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageComponentInteraction, MessageSelectMenu, Options, SelectMenuInteraction } from "discord.js";
+import { ButtonInteraction, CommandInteraction, GuildEmoji, Message, MessageActionRow, MessageButton, MessageComponentInteraction, MessageSelectMenu, Options, SelectMenuInteraction, User } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
-import { LobbyConfiguration, MR_TYPE, PRIVACY, REGISTRATION_STEP } from "../../../types/lobby";
+import { register } from ".";
+import { LobbyConfiguration, MR_TYPE, MysqlData, PRIVACY, REGISTRATION_STEP } from "../../../types/lobby";
 import { SelectMenuConfiguration } from "../../../types/selectMenu";
 import { getButtonActionRow, getErrorTemplate, getSelectActionRow } from "../../../utils/template";
 import { getCreateLobbyTemplate } from "../template";
+import { EventEmitter } from 'events';
+import { mysqlDb } from "../../../database/mysqlDatabase";
+import { RowDataPacket } from "mysql2";
 
 const PRIVACY_MENU : SelectMenuConfiguration = {
     placeholder: 'Please select game privacy',
@@ -71,6 +76,8 @@ const OVERTIME_MENU : SelectMenuConfiguration = {
 }
 
 export async function createLobby(interaction: CommandInteraction) {
+    const event = new EventEmitter();
+
     let registrationStep : REGISTRATION_STEP = REGISTRATION_STEP.PRIVACY
     let lobbyConfiguration : LobbyConfiguration = {
         Privacy: null,
@@ -96,8 +103,8 @@ export async function createLobby(interaction: CommandInteraction) {
     if (message instanceof Message) {
         const filter = (message : Message) => message.interaction?.user.id === memberId;
         const collector = message.createMessageComponentCollector();
-    
-        collector.on('collect', (interaction : SelectMenuInteraction | ButtonInteraction) => {
+   
+        collector.on('collect', async (interaction : SelectMenuInteraction | ButtonInteraction) => {
             if (interaction.user.id === memberId) {
                 if (interaction.componentType === 'SELECT_MENU') {
                     switch(registrationStep) {
@@ -121,11 +128,12 @@ export async function createLobby(interaction: CommandInteraction) {
                         }
                         case REGISTRATION_STEP.OVERTIME : {
                             lobbyConfiguration.Overtime = (interaction.values[0] === 'overtime_yes')
-                            interaction.channel?.send("ENDED");
                             interaction.update({
-                                components: []
-                            });
-                            registrationStep = REGISTRATION_STEP.ENDED;
+                                embeds:[getCreateLobbyTemplate(lobbyConfiguration)],
+                                components:[]
+                            })
+                            event.emit('waitingPlayers', interaction)
+                            registrationStep = REGISTRATION_STEP.WAITING_FOR_PLAYERS;
                             break;
                         }
                     }
@@ -153,17 +161,74 @@ export async function createLobby(interaction: CommandInteraction) {
                             registrationStep = REGISTRATION_STEP.MR;
                             break;
                         }
-                    }                    
+                    }            
                 }
 
-                if (registrationStep === REGISTRATION_STEP.ENDED)
-                {
-                    interaction.channel?.send("done");
+                if (registrationStep == REGISTRATION_STEP.WAITING_FOR_PLAYERS) {
                     collector.stop();
                 }
             }
         });
-    }    
+
+        event.once('waitingPlayers', async(interaction : SelectMenuInteraction | ButtonInteraction) =>  {
+            const lobbyActions = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setCustomId('join')
+                    .setStyle('PRIMARY')
+                    .setEmoji('🤖')
+                    .setDisabled(false),
+            )
+            .addComponents(
+                new MessageButton()
+                .setCustomId('leave')
+                .setStyle('PRIMARY')
+                .setLabel('🤖')
+                .setDisabled(false),
+            );
+        
+            let follow = await interaction.followUp({
+                embeds: [getCreateLobbyTemplate(lobbyConfiguration)],
+                components: [lobbyActions],
+                ephemeral: false
+            })
+        
+            if (follow instanceof Message) {
+                const filter = (message : Message) => message.interaction?.user.id === memberId;
+                const collector = follow.createMessageComponentCollector();
+        
+                collector.on('collect', async (interaction : SelectMenuInteraction | ButtonInteraction) => {
+                    if (interaction.componentType === 'BUTTON') {
+                        switch(interaction.customId) {
+                            case 'join': {
+                                const queryString : string = `SELECT * FROM du_users WHERE userid=?`
+                                mysqlDb.query(queryString, interaction.user.id, (err, result) => {
+                                    if (err) { console.log(err) }
+                                    if (result) {
+                                        const row = (<RowDataPacket> result)[0];
+                                        if (row) {
+                                            const user: MysqlData =  {
+                                                ID: row.ID,
+                                                LastAccountUse: row.last_accountuse,
+                                                Member: row.member,
+                                                SteamID: row.steamid,
+                                                UserID: row.userid
+                                            }
+                                            console.log(user);
+                                            interaction.reply(interaction.user.username + " just join the lobby");
+                                        } else {
+                                            interaction.reply(interaction.user.username + " please link your steam id in order to join a lobby");
+                                        }
+                                    }
+                                })
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
 }
 
 function updateInteraction (interaction : SelectMenuInteraction | ButtonInteraction, button : MessageActionRow, selectMenu : MessageActionRow, selectMenuConfiguration : SelectMenuConfiguration, disableButton : boolean, lobbyConfiguration: LobbyConfiguration) {

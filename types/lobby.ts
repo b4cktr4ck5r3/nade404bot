@@ -4,6 +4,8 @@ export enum REGISTRATION_STEP {
     KNIFE = 1,
     MR = 2,
     OVERTIME = 3,
+    WAITING_FOR_PLAYERS = 4,
+    LAUNCHING_GAME = 5,
     ENDED = 10,
 }
 
@@ -22,4 +24,16 @@ export type LobbyConfiguration = {
     KnifeEnabled : boolean | null,
     MRType : MR_TYPE | null,
     Overtime: boolean | null 
+}
+
+export interface MysqlData {
+    ID : number,
+    UserID : string,
+    SteamID : string,
+    Member: number,
+    LastAccountUse : number
+}
+
+export type LobbyConfigurationBodyRequest = {
+
 }

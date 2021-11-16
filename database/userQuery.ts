@@ -1,6 +1,6 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 import { User } from "../types/user";
-import database from "./database";
+import database from "./mongoDatabase";
 
 const UserSchema : Schema = new Schema({
     discordId: String,

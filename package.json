@@ -27,11 +27,14 @@
     "@discordjs/builders": "^0.6.0",
     "@discordjs/rest": "^0.1.0-canary.0",
     "@types/mongoose": "^5.11.97",
+    "@types/mysql": "^2.15.19",
     "axios": "^0.23.0",
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.2.0",
     "moment": "^2.29.1",
     "mongoose": "^6.0.11",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
     "steamid": "^2.0.0"
   }
 }

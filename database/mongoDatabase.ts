@@ -1,7 +1,7 @@
 import { Mongoose } from "mongoose";
 import { mongoUri, mongoDb, mongoUser, mongoPass } from "../config.json";
 
-class Database {
+class MongoDatabase {
   private db: Mongoose;
 
   constructor() {
@@ -20,4 +20,4 @@ class Database {
   }
 }
 
-export default new Database();
+export default new MongoDatabase();
