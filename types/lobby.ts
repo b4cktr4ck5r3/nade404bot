@@ -26,7 +26,7 @@ export type LobbyConfiguration = {
     Overtime: boolean | null 
 }
 
-export interface MysqlData {
+export interface LobbyMysqlData {
     ID : number,
     UserID : string,
     SteamID : string,

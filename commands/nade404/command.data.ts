@@ -8,20 +8,6 @@ export const data : SlashCommandSubcommandsOnlyBuilder = new SlashCommandBuilder
     .addSubcommand(subCommand =>
         subCommand.setName("me")
                 .setDescription("Retrieve stats about you if you're registerd"))
-    .addSubcommand(subCommand =>
-        subCommand.setName("register")
-                .setDescription("Register steam_id to disord account")
-                .addStringOption((options: SlashCommandStringOption) =>
-                options.setName("steamid")
-                .setDescription("You're steamid")
-                .setRequired(true)))
-    .addSubcommand(subCommand => 
-        subCommand.setName("change_steam_id")
-        .setDescription("Change registered steam_id")
-        .addStringOption((options : SlashCommandStringOption) =>
-        options.setName("steamid")
-        .setDescription("New steamid")
-        .setRequired(true)))
     .addSubcommand(subCommand => 
         subCommand.setName("top10kd")
                     .setDescription("Retrieve top 10 players based on kd value"))

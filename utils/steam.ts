@@ -3,7 +3,7 @@ import { steamKey } from '../config.json'
 import { SteamResolveVanityResponse, SteamSummaryResponse } from '../types/response'
 import SteamId from 'steamid'
 
-export function formatSteamId(steamId : string | undefined) : string {
+export function formatSteamId(steamId : string | null) : string {
     if (typeof steamId === 'string')
         return steamId.startsWith("STEAM_0") ? steamId.replace("STEAM_0", "STEAM_1") : steamId
     else

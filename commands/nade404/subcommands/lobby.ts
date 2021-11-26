@@ -2,13 +2,12 @@ import { formatEmoji } from "@discordjs/builders";
 import { APIMessage } from "discord-api-types";
 import { ButtonInteraction, CommandInteraction, GuildEmoji, Message, MessageActionRow, MessageButton, MessageComponentInteraction, MessageSelectMenu, Options, SelectMenuInteraction, User } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
-import { register } from ".";
-import { LobbyConfiguration, MR_TYPE, MysqlData, PRIVACY, REGISTRATION_STEP } from "../../../types/lobby";
+import { LobbyConfiguration, MR_TYPE, LobbyMysqlData, PRIVACY, REGISTRATION_STEP } from "../../../types/lobby";
 import { SelectMenuConfiguration } from "../../../types/selectMenu";
 import { getButtonActionRow, getErrorTemplate, getSelectActionRow } from "../../../utils/template";
 import { getCreateLobbyTemplate } from "../template";
 import { EventEmitter } from 'events';
-import { mysqlDb } from "../../../database/mysqlDatabase";
+// import { mysqlDb } from "../../../database/mysqlDatabase";
 import { RowDataPacket } from "mysql2";
 
 const PRIVACY_MENU : SelectMenuConfiguration = {
@@ -202,25 +201,25 @@ export async function createLobby(interaction: CommandInteraction) {
                         switch(interaction.customId) {
                             case 'join': {
                                 const queryString : string = `SELECT * FROM du_users WHERE userid=?`
-                                mysqlDb.query(queryString, interaction.user.id, (err, result) => {
-                                    if (err) { console.log(err) }
-                                    if (result) {
-                                        const row = (<RowDataPacket> result)[0];
-                                        if (row) {
-                                            const user: MysqlData =  {
-                                                ID: row.ID,
-                                                LastAccountUse: row.last_accountuse,
-                                                Member: row.member,
-                                                SteamID: row.steamid,
-                                                UserID: row.userid
-                                            }
-                                            console.log(user);
-                                            interaction.reply(interaction.user.username + " just join the lobby");
-                                        } else {
-                                            interaction.reply(interaction.user.username + " please link your steam id in order to join a lobby");
-                                        }
-                                    }
-                                })
+                                // mysqlDb.query(queryString, interaction.user.id, (err, result) => {
+                                //     if (err) { console.log(err) }
+                                //     if (result) {
+                                //         const row = (<RowDataPacket> result)[0];
+                                //         if (row) {
+                                //             const user: MysqlData =  {
+                                //                 ID: row.ID,
+                                //                 LastAccountUse: row.last_accountuse,
+                                //                 Member: row.member,
+                                //                 SteamID: row.steamid,
+                                //                 UserID: row.userid
+                                //             }
+                                //             console.log(user);
+                                //             interaction.reply(interaction.user.username + " just join the lobby");
+                                //         } else {
+                                //             interaction.reply(interaction.user.username + " please link your steam id in order to join a lobby");
+                                //         }
+                                //     }
+                                // })
                                 break;
                             }
                         }

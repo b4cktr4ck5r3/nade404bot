@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import userQuery from "../../../database/userQuery";
+import { FindUser } from "../../../database/query";
 import { Player } from "../../../types/player";
 import { ApiResponse } from "../../../types/response";
 import { getStatsBySteamId } from "../../../utils/apiCalls";
@@ -9,7 +9,7 @@ import { getStatsTemplate } from "../template";
 
 export async function statsDiscord(interaction: CommandInteraction) {
     const discordId : string = interaction.options.getUser('user', true).id;
-    const steamId : string | null | undefined = formatSteamId(await userQuery.getUser(discordId).then(user => user?.steamId));
+    const steamId : string | null = formatSteamId(await FindUser(discordId).then(user => user.steamId));
     if (steamId) {
         const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
         if (success) interaction.reply({ embeds: [await getStatsTemplate(players as Player)] })
