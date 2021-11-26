@@ -5,25 +5,25 @@ import { LobbyMysqlData } from "../types/lobby";
 import { User, UserMysqlData } from '../types/user';
 
 class DatabaseService {
-    private db: mysql2.Connection
+    private pool: mysql2.Pool
     
     constructor() {
-        this.db = mysql2.createConnection({
+        this.pool = mysql2.createPool({
             host:mysqlHost,
             port:mysqlPort,
             user:mysqlUser,
             password:mysqlPassword,
             database:mysqlDatabase
         })
-
-        this.db.connect((err) => {
+        
+        this.pool.getConnection((err) => {
             if (err) console.log("Not connected to MySQL DB : " + err);
             else console.log("Connected to MySQL DB");
         })
     }
 
-    getDatabase() {
-        return this.db;
+    getPool() {
+        return this.pool;
     }
 }
 

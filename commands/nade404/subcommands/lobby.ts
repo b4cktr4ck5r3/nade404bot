@@ -9,6 +9,7 @@ import { getCreateLobbyTemplate } from "../template";
 import { EventEmitter } from 'events';
 // import { mysqlDb } from "../../../database/mysqlDatabase";
 import { RowDataPacket } from "mysql2";
+import { FindUser, QueryReturn } from "../../../database/query";
 
 const PRIVACY_MENU : SelectMenuConfiguration = {
     placeholder: 'Please select game privacy',
@@ -200,26 +201,10 @@ export async function createLobby(interaction: CommandInteraction) {
                     if (interaction.componentType === 'BUTTON') {
                         switch(interaction.customId) {
                             case 'join': {
-                                const queryString : string = `SELECT * FROM du_users WHERE userid=?`
-                                // mysqlDb.query(queryString, interaction.user.id, (err, result) => {
-                                //     if (err) { console.log(err) }
-                                //     if (result) {
-                                //         const row = (<RowDataPacket> result)[0];
-                                //         if (row) {
-                                //             const user: MysqlData =  {
-                                //                 ID: row.ID,
-                                //                 LastAccountUse: row.last_accountuse,
-                                //                 Member: row.member,
-                                //                 SteamID: row.steamid,
-                                //                 UserID: row.userid
-                                //             }
-                                //             console.log(user);
-                                //             interaction.reply(interaction.user.username + " just join the lobby");
-                                //         } else {
-                                //             interaction.reply(interaction.user.username + " please link your steam id in order to join a lobby");
-                                //         }
-                                //     }
-                                // })
+                                let res : QueryReturn = await FindUser(interaction.user.id).then(res => res);
+                                console.log(res);
+                                if (res.success) interaction.reply(interaction.user.username + " just join the lobby");
+                                else interaction.reply(interaction.user.username + " please link your steam id in order to join a lobby");
                                 break;
                             }
                         }

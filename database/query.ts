@@ -3,7 +3,7 @@ import { User, UserMysqlData } from "../types/user";
 import { RowDataPacket } from "mysql2";
 import * as mysql2 from "mysql2";
 
-interface QueryReturn {
+export interface QueryReturn {
     success: boolean,
     steamId: string | null
 }
@@ -16,7 +16,7 @@ export async function FindUser(discordId: string) : Promise<QueryReturn> {
         }
 
         const queryString : string = `SELECT * FROM du_users WHERE userid=?`
-        db.getDatabase().query(queryString, discordId, (err, rows : RowDataPacket[], fields) => {
+        db.getPool().query(queryString, discordId, (err, rows : RowDataPacket[], fields) => {
             if (err) {
                 console.log(err)
                 return reject(err);
@@ -25,6 +25,7 @@ export async function FindUser(discordId: string) : Promise<QueryReturn> {
             if (rows && rows.length > 0) {
                 const row = (<RowDataPacket> rows)[0];
                 if (row) {
+                    res.success = true;
                     res.steamId = row.steamid;
                 }
             }
