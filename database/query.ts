@@ -15,7 +15,7 @@ export async function FindUser(discordId: string) : Promise<QueryReturn> {
             steamId: null
         }
 
-        const queryString : string = `SELECT * FROM du_users WHERE userid=?`
+        const queryString = `SELECT * FROM du_users WHERE userid=?`;
         db.getPool().query(queryString, discordId, (err, rows : RowDataPacket[], fields) => {
             if (err) {
                 console.log(err)

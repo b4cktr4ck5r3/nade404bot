@@ -80,11 +80,11 @@ export function getTop10Template(players : Players, type : Top10Type) : MessageE
 }
 
 export function getCreateLobbyTemplate(lobbyConfiguration : LobbyConfiguration) : MessageEmbed {
-    const color : ColorResolvable = "RANDOM"
+    const color : ColorResolvable = "ORANGE"
     const fields : EmbedFieldData | EmbedFieldData[] = Object.entries(lobbyConfiguration)
     .filter(([name, value]) => value !== null)
     .map(([name, value]) => {
-        convertPropertyNameToField(name);
+        name = convertPropertyNameToField(name);
         return {name, value : String(value) }
     });
 
@@ -98,11 +98,24 @@ export function getCreateLobbyTemplate(lobbyConfiguration : LobbyConfiguration) 
     return template;
 }
 
-function convertPropertyNameToField(name: string): void {
+export function getEndedLobbyConfig(lobbyConfiguration : LobbyConfiguration) : MessageEmbed {
+    const template : MessageEmbed = new MessageEmbed()
+    .setColor("GREEN")
+    .setTitle(`📊 Creation of the lobby`)
+    .setDescription('Configuring lobby')
+    // .addFields(fields)
+    .setFooter(`Generate the ${getCurrentFormatedDate()}`)
+
+    return template;
+}
+
+function convertPropertyNameToField(name: string): string {
     switch (name) {
         case 'KnifeEnabled':
-            name = 'Knife enabled';
+            return 'Knife enabled';
         case 'MRType':
-            name = 'MR Type';
+            return 'MR Type';
+        default:
+            return name
     }
 }

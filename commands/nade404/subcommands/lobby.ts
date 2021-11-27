@@ -129,7 +129,7 @@ export async function createLobby(interaction: CommandInteraction) {
                         case REGISTRATION_STEP.OVERTIME : {
                             lobbyConfiguration.Overtime = (interaction.values[0] === 'overtime_yes')
                             interaction.update({
-                                embeds:[getCreateLobbyTemplate(lobbyConfiguration)],
+                                embeds:[getErrorTemplate("Test", "Test")],
                                 components:[]
                             })
                             event.emit('waitingPlayers', interaction)
