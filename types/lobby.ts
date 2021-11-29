@@ -1,3 +1,5 @@
+import { du_users } from "@prisma/client"
+
 export enum REGISTRATION_STEP {
     CANCELED = -1,
     PRIVACY = 0,
@@ -36,4 +38,8 @@ export interface LobbyMysqlData {
 
 export type LobbyConfigurationBodyRequest = {
 
+}
+export interface LobbyPlayer {
+    username: string,
+    user: du_users
 }

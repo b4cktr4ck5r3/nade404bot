@@ -1,9 +1,11 @@
+import { du_users } from ".prisma/client";
 import { ColorResolvable, EmbedFieldData, MessageEmbed } from "discord.js";
-import { LobbyConfiguration } from "../../types/lobby";
+import { LobbyConfiguration, LobbyPlayer } from "../../types/lobby";
 import { Player, Players } from "../../types/player";
 import { Top10Type } from "../../types/top10";
 import { getCurrentFormatedDate } from "../../utils/date";
 import { getSteamInfos } from "../../utils/steam";
+import { userMention } from "@discordjs/builders";
 
 export async function getStatsTemplate(player : Player) : Promise<MessageEmbed> {
     const color : ColorResolvable = player.ratio > 1 ? 'GREEN' : 'RED';
@@ -85,7 +87,7 @@ export function getCreateLobbyTemplate(lobbyConfiguration : LobbyConfiguration) 
     .filter(([name, value]) => value !== null)
     .map(([name, value]) => {
         name = convertPropertyNameToField(name);
-        return {name, value : String(value) }
+        return {name, value : String(value), inline: true}
     });
 
     const template : MessageEmbed = new MessageEmbed()
@@ -101,9 +103,39 @@ export function getCreateLobbyTemplate(lobbyConfiguration : LobbyConfiguration) 
 export function getEndedLobbyConfig(lobbyConfiguration : LobbyConfiguration) : MessageEmbed {
     const template : MessageEmbed = new MessageEmbed()
     .setColor("GREEN")
-    .setTitle(`📊 Creation of the lobby`)
+    .setTitle(`📊 Lobby created`)
     .setDescription('Configuring lobby')
-    // .addFields(fields)
+    .addFields({
+        name: "Ended",
+        value: "Lobby created"
+    })
+    .setFooter(`Generate the ${getCurrentFormatedDate()}`)
+
+    return template;
+}
+
+export function getWaintingPlayerLobby(lobbyConfiguration : LobbyConfiguration, players : du_users[]) : MessageEmbed {
+    const color : ColorResolvable = "ORANGE"
+    const fields : EmbedFieldData | EmbedFieldData[] = Object.entries(lobbyConfiguration)
+    .filter(([name, value]) => value !== null)
+    .map(([name, value]) => {
+        name = convertPropertyNameToField(name);
+        return {name, value : String(value), inline: true}
+    });
+
+    let strPlayers : string = players.map(p => userMention(p.userid)).join('\n');
+    if (!strPlayers) strPlayers = "Waiting for players..."
+
+    fields.push({
+        name: 'Players in lobby',
+        value: strPlayers
+    })
+
+    const template : MessageEmbed = new MessageEmbed()
+    .setColor(color)
+    .setTitle(`📊 Lobby created`)
+    .setDescription('Lobby configuration:')
+    .addFields(fields)
     .setFooter(`Generate the ${getCurrentFormatedDate()}`)
 
     return template;
@@ -111,10 +143,14 @@ export function getEndedLobbyConfig(lobbyConfiguration : LobbyConfiguration) : M
 
 function convertPropertyNameToField(name: string): string {
     switch (name) {
+        case 'Privacy':
+            return '🔑 Privacy';
         case 'KnifeEnabled':
-            return 'Knife enabled';
+            return '🔪 Knife';
         case 'MRType':
-            return 'MR Type';
+            return '🎮 Rounds';
+        case 'Overtime':
+            return '⚔️ Overtime';
         default:
             return name
     }

@@ -1,14 +1,15 @@
 import { formatEmoji } from "@discordjs/builders";
 import { APIMessage } from "discord-api-types";
-import { ButtonInteraction, CommandInteraction, GuildEmoji, Message, MessageActionRow, MessageButton, MessageComponentInteraction, MessageSelectMenu, Options, SelectMenuInteraction, User } from "discord.js";
+import { ButtonInteraction, CommandInteraction, GuildEmoji, Message, MessageActionRow, MessageButton, MessageComponentInteraction, MessageSelectMenu, Options, SelectMenuInteraction, User, UserFlags } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
-import { LobbyConfiguration, MR_TYPE, PRIVACY, REGISTRATION_STEP } from "../../../types/lobby";
+import { LobbyConfiguration, LobbyPlayer, MR_TYPE, PRIVACY, REGISTRATION_STEP } from "../../../types/lobby";
 import { SelectMenuConfiguration } from "../../../types/selectMenu";
 import { getButtonActionRow, getErrorTemplate, getSelectActionRow } from "../../../utils/template";
-import { getCreateLobbyTemplate } from "../template";
+import { getCreateLobbyTemplate, getEndedLobbyConfig, getWaintingPlayerLobby } from "../template";
 import { EventEmitter } from 'events';
 import * as data from '../../../data/index'
-import { prisma } from "../../../lib/prisma/prisma";
+import { du_users } from ".prisma/client";
+import { prismaLink } from "../../../lib/prisma/prisma";
 
 export async function createLobby(interaction: CommandInteraction) {
     const event = new EventEmitter();
@@ -64,7 +65,7 @@ export async function createLobby(interaction: CommandInteraction) {
                         case REGISTRATION_STEP.OVERTIME : {
                             lobbyConfiguration.Overtime = (interaction.values[0] === 'overtime_yes')
                             interaction.update({
-                                embeds:[getErrorTemplate("Test", "Test")],
+                                embeds:[getEndedLobbyConfig(lobbyConfiguration)],
                                 components:[]
                             })
                             event.emit('waitingPlayers', interaction)
@@ -111,19 +112,21 @@ export async function createLobby(interaction: CommandInteraction) {
                 new MessageButton()
                     .setCustomId('join')
                     .setStyle('PRIMARY')
-                    .setEmoji('🤖')
+                    .setEmoji('🆙')
                     .setDisabled(false),
             )
             .addComponents(
                 new MessageButton()
                 .setCustomId('leave')
                 .setStyle('PRIMARY')
-                .setLabel('🤖')
+                .setLabel('↩️')
                 .setDisabled(false),
             );
-        
+
+            let players : du_users[] = [];        
+
             let follow = await interaction.followUp({
-                embeds: [getCreateLobbyTemplate(lobbyConfiguration)],
+                embeds: [getWaintingPlayerLobby(lobbyConfiguration, players)],
                 components: [lobbyActions],
                 ephemeral: false
             })
@@ -134,16 +137,55 @@ export async function createLobby(interaction: CommandInteraction) {
         
                 collector.on('collect', async (interaction : SelectMenuInteraction | ButtonInteraction) => {
                     if (interaction.componentType === 'BUTTON') {
+                        const user = await prismaLink.du_users.findFirst({
+                            where: {
+                                userid: interaction.user.id,
+                            },
+                        })
+
                         switch(interaction.customId) {
                             case 'join': {
-                                const user = await prisma.du_users.findFirst({
-                                    where: {
-                                        userid: interaction.user.id,
-                                    },
-                                })
+                                if (players.length == 10) {
+                                    interaction.reply({
+                                        content: "Sorry lobby is full",
+                                        ephemeral: true
+                                        });                                    
+                                    break;
+                                }
 
                                 if (user) {
-                                    interaction.reply(interaction.user.username + " just join the lobby");
+                                    const found = players.find(p => p.userid == user.userid);
+                                    if (!found) {
+                                        players.push(user);
+                                        interaction.update({
+                                            embeds: [getWaintingPlayerLobby(lobbyConfiguration, players)]
+                                        })
+                                    } else {
+                                        interaction.reply({
+                                        content: "You are already in the lobby",
+                                        ephemeral: true
+                                        });
+                                    }
+                                } else {
+                                    interaction.reply(interaction.user.username + " please link your steam id in order to join a lobby");
+                                }
+
+                                break;
+                            }
+                            case 'leave' : {
+                                if (user) {
+                                    const found = players.find(p => p.userid == user.userid);
+                                    if (found) {
+                                        players = players.filter(p => p.userid != user.userid);
+                                        interaction.update({
+                                            embeds: [getWaintingPlayerLobby(lobbyConfiguration, players)]
+                                        })
+                                    } else {
+                                        interaction.reply({
+                                            content: "You are not in the lobby",
+                                            ephemeral: true
+                                            });
+                                    }
                                 } else {
                                     interaction.reply(interaction.user.username + " please link your steam id in order to join a lobby");
                                 }
@@ -151,8 +193,16 @@ export async function createLobby(interaction: CommandInteraction) {
                             }
                         }
                     }
+
+                    if (players.length == 10) {
+                        event.emit("lobbyFull", interaction, players)
+                    }
                 });
             }
+        });
+
+        event.once('lobbyFull', async(interaction : SelectMenuInteraction | ButtonInteraction, players: du_users[]) => {
+
         });
     }
 }

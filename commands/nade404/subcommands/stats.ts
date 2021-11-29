@@ -1,6 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { FindUser } from "../../../database/query";
-import { prisma } from "../../../lib/prisma/prisma";
+import { prismaLink } from "../../../lib/prisma/prisma";
 import { Player } from "../../../types/player";
 import { ApiResponse } from "../../../types/response";
 import { getStatsBySteamId } from "../../../utils/apiCalls";
@@ -11,7 +10,7 @@ import { getStatsTemplate } from "../template";
 export async function statsDiscord(interaction: CommandInteraction) {
     const discordId : string = interaction.options.getUser('user', true).id;
 
-    const user = await prisma.du_users.findFirst({
+    const user = await prismaLink.du_users.findFirst({
         where: {
             userid: discordId,
         },
