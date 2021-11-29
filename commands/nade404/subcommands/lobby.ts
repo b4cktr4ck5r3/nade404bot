@@ -2,14 +2,11 @@ import { formatEmoji } from "@discordjs/builders";
 import { APIMessage } from "discord-api-types";
 import { ButtonInteraction, CommandInteraction, GuildEmoji, Message, MessageActionRow, MessageButton, MessageComponentInteraction, MessageSelectMenu, Options, SelectMenuInteraction, User } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
-import { LobbyConfiguration, MR_TYPE, LobbyMysqlData, PRIVACY, REGISTRATION_STEP } from "../../../types/lobby";
+import { LobbyConfiguration, MR_TYPE, PRIVACY, REGISTRATION_STEP } from "../../../types/lobby";
 import { SelectMenuConfiguration } from "../../../types/selectMenu";
 import { getButtonActionRow, getErrorTemplate, getSelectActionRow } from "../../../utils/template";
 import { getCreateLobbyTemplate } from "../template";
 import { EventEmitter } from 'events';
-// import { mysqlDb } from "../../../database/mysqlDatabase";
-import { RowDataPacket } from "mysql2";
-import { FindUser, QueryReturn } from "../../../database/query";
 import * as data from '../../../data/index'
 import { prisma } from "../../../lib/prisma/prisma";
 
