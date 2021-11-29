@@ -9,7 +9,8 @@ import { getCreateLobbyTemplate, getEndedLobbyConfig, getWaintingPlayerLobby } f
 import { EventEmitter } from 'events';
 import * as data from '../../../data/index'
 import { du_users } from ".prisma/client";
-import { prismaLink } from "../../../lib/prisma/prisma";
+import { prismaLink, prismaLobbies } from "../../../lib/prisma/prisma";
+import { createLobbyMatch } from "../../../utils/apiCalls";
 
 export async function createLobby(interaction: CommandInteraction) {
     const event = new EventEmitter();
@@ -130,6 +131,8 @@ export async function createLobby(interaction: CommandInteraction) {
                 components: [lobbyActions],
                 ephemeral: false
             })
+
+            const MAX_PLAYERS = 1
         
             if (follow instanceof Message) {
                 const filter = (message : Message) => message.interaction?.user.id === memberId;
@@ -145,7 +148,7 @@ export async function createLobby(interaction: CommandInteraction) {
 
                         switch(interaction.customId) {
                             case 'join': {
-                                if (players.length == 10) {
+                                if (players.length == MAX_PLAYERS) {
                                     interaction.reply({
                                         content: "Sorry lobby is full",
                                         ephemeral: true
@@ -194,7 +197,7 @@ export async function createLobby(interaction: CommandInteraction) {
                         }
                     }
 
-                    if (players.length == 10) {
+                    if (players.length == MAX_PLAYERS) {
                         event.emit("lobbyFull", interaction, players)
                     }
                 });
@@ -202,7 +205,31 @@ export async function createLobby(interaction: CommandInteraction) {
         });
 
         event.once('lobbyFull', async(interaction : SelectMenuInteraction | ButtonInteraction, players: du_users[]) => {
+            console.log(lobbyConfiguration);
+            const server = await prismaLobbies.server_status.findFirst({
+                where: {
+                    USED: false
+                },
+            })
 
+            if (server) {
+                await prismaLobbies.server_status.update({
+                    where: {
+                        IP: server.IP
+                    },
+                    data: {
+                        USED: true,
+                        GAME_MODE: "PICKUP"
+                    },
+                })
+            }
+            else {
+                // No server available found (all used cancel the lobby here)
+            }
+
+            const toto = await createLobbyMatch(lobbyConfiguration, players.map(p => p.steamid));
+            console.log(toto.team1);
+            console.log(toto.team2);
         });
     }
 }
