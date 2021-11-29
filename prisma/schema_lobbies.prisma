@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("LOBBY_DATABASE_URL")
+}
+
+model lobby {
+  ID            String          @unique(map: "ID") @db.VarChar(128)
+  SERVER_IP     String          @db.Char(64)
+  ENDED         Boolean
+  ENDED_AT      DateTime        @db.Date
+  server_status server_status   @relation(fields: [SERVER_IP], references: [IP], onDelete: NoAction, map: "SERVER_IP")
+  lobby_players lobby_players[]
+
+  @@index([SERVER_IP], map: "SERVER_IP")
+}
+
+model lobby_players {
+  ID       Int    @id @default(autoincrement())
+  STEAM_ID String @db.VarChar(20)
+  LOBBY_ID String @db.VarChar(128)
+  lobby    lobby  @relation(fields: [LOBBY_ID], references: [ID], onDelete: NoAction, map: "LOBBY_ID")
+
+  @@index([LOBBY_ID], map: "LOBBY_ID")
+  @@index([STEAM_ID], map: "STEAM_ID")
+}
+
+model server_status {
+  IP        String  @id @db.Char(64)
+  USED      Boolean @default(false)
+  GAME_MODE String? @db.VarChar(16)
+  lobby     lobby[]
+}

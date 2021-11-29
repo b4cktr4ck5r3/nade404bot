@@ -10,70 +10,8 @@ import { EventEmitter } from 'events';
 // import { mysqlDb } from "../../../database/mysqlDatabase";
 import { RowDataPacket } from "mysql2";
 import { FindUser, QueryReturn } from "../../../database/query";
-
-const PRIVACY_MENU : SelectMenuConfiguration = {
-    placeholder: 'Please select game privacy',
-    options: [
-        {
-            label: 'Public',
-            description: 'Create a public game',
-            value: 'public'
-        },
-        {
-            label: 'Private',
-            description: 'Create private game',
-            value: 'private'
-        }
-    ]
-}
-
-const KNIFE_MENU : SelectMenuConfiguration = {
-    placeholder: 'Please select knife round enabled',
-    options:[
-        {
-            label: 'Yes',
-            description: 'Play knife round',
-            value: 'knife_on'
-        },
-        {
-            label: 'No',
-            description: "Don't play knife round",
-            value: 'knife_off'
-        }
-    ]
-}
-
-const ROUNDS_MENU : SelectMenuConfiguration = {
-    placeholder: 'Please select number of round',
-    options:[
-        {
-            label: 'MR16',
-            description: '16 rounds to win',
-            value: 'mr16'
-        },
-        {
-            label: 'MR8',
-            description: '8 rounds to win',
-            value: 'mr8'
-        }
-    ]
-}
-
-const OVERTIME_MENU : SelectMenuConfiguration = {
-    placeholder: 'Please select overtime enabled',
-    options:[
-        {
-            label: 'Yes',
-            description: 'Play overtime',
-            value: 'overtime_yes'
-        },
-        {
-            label: 'No',
-            description: "Don't play overtime",
-            value: 'overtime_no'
-        }
-    ]
-}
+import * as data from '../../../data/index'
+import { prisma } from "../../../lib/prisma/prisma";
 
 export async function createLobby(interaction: CommandInteraction) {
     const event = new EventEmitter();
@@ -89,7 +27,7 @@ export async function createLobby(interaction: CommandInteraction) {
     const memberId = interaction.user.id;
 
     const backButton = getButtonActionRow('back', 'Back', MessageButtonStyles.PRIMARY, true);
-    const selectMenu = getSelectActionRow('selectMenu', PRIVACY_MENU.placeholder, PRIVACY_MENU.options);
+    const selectMenu = getSelectActionRow('selectMenu', data.PRIVACY_MENU.placeholder, data.PRIVACY_MENU.options);
 
     interaction.reply(
         { 
@@ -110,19 +48,19 @@ export async function createLobby(interaction: CommandInteraction) {
                     switch(registrationStep) {
                         case REGISTRATION_STEP.PRIVACY : {
                             lobbyConfiguration.Privacy = interaction.values[0] as PRIVACY
-                            updateInteraction(interaction, backButton, selectMenu, KNIFE_MENU, false, lobbyConfiguration);
+                            updateInteraction(interaction, backButton, selectMenu, data.KNIFE_MENU, false, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.KNIFE;
                             break;
                         }
                         case REGISTRATION_STEP.KNIFE : {
                             lobbyConfiguration.KnifeEnabled = (interaction.values[0] === 'knife_on')
-                            updateInteraction(interaction, backButton, selectMenu, ROUNDS_MENU, false, lobbyConfiguration);
+                            updateInteraction(interaction, backButton, selectMenu, data.ROUNDS_MENU, false, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.MR;
                             break;
                         }
                         case REGISTRATION_STEP.MR : {
                             lobbyConfiguration.MRType = interaction.values[0] as MR_TYPE
-                            updateInteraction(interaction, backButton, selectMenu, OVERTIME_MENU, false, lobbyConfiguration);
+                            updateInteraction(interaction, backButton, selectMenu, data.OVERTIME_MENU, false, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.OVERTIME;
                             break;
                         }
@@ -143,21 +81,21 @@ export async function createLobby(interaction: CommandInteraction) {
                     switch(registrationStep) {
                         case REGISTRATION_STEP.KNIFE: {
                             lobbyConfiguration.Privacy = null;
-                            updateInteraction(interaction, backButton, selectMenu, PRIVACY_MENU, true, lobbyConfiguration);
+                            updateInteraction(interaction, backButton, selectMenu, data.PRIVACY_MENU, true, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.PRIVACY
                             break;
                         }
                         case REGISTRATION_STEP.MR : {
                             lobbyConfiguration.MRType = null;
                             lobbyConfiguration.KnifeEnabled = null;
-                            updateInteraction(interaction, backButton, selectMenu, KNIFE_MENU, false, lobbyConfiguration);
+                            updateInteraction(interaction, backButton, selectMenu, data.KNIFE_MENU, false, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.KNIFE;
                             break;
                         }
                         case REGISTRATION_STEP.OVERTIME : {
                             lobbyConfiguration.Overtime = null;
                             lobbyConfiguration.MRType = null;
-                            updateInteraction(interaction, backButton, selectMenu, ROUNDS_MENU, false, lobbyConfiguration);
+                            updateInteraction(interaction, backButton, selectMenu, data.ROUNDS_MENU, false, lobbyConfiguration);
                             registrationStep = REGISTRATION_STEP.MR;
                             break;
                         }
@@ -201,10 +139,17 @@ export async function createLobby(interaction: CommandInteraction) {
                     if (interaction.componentType === 'BUTTON') {
                         switch(interaction.customId) {
                             case 'join': {
-                                let res : QueryReturn = await FindUser(interaction.user.id).then(res => res);
-                                console.log(res);
-                                if (res.success) interaction.reply(interaction.user.username + " just join the lobby");
-                                else interaction.reply(interaction.user.username + " please link your steam id in order to join a lobby");
+                                const user = await prisma.du_users.findFirst({
+                                    where: {
+                                        userid: interaction.user.id,
+                                    },
+                                })
+
+                                if (user) {
+                                    interaction.reply(interaction.user.username + " just join the lobby");
+                                } else {
+                                    interaction.reply(interaction.user.username + " please link your steam id in order to join a lobby");
+                                }
                                 break;
                             }
                         }
