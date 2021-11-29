@@ -1,6 +1,5 @@
 import { du_users } from ".prisma/client";
 import { CommandInteraction } from "discord.js";
-import { FindUser } from "../../../database/query";
 import { prisma } from "../../../lib/prisma/prisma";
 import { Player } from "../../../types/player";
 import { ApiResponse } from "../../../types/response";
@@ -18,7 +17,7 @@ export async function me(interaction: CommandInteraction){
     })
 
     if (user) {
-        let steamId : string | null = formatSteamId(user?.steamid);
+        let steamId : string | null = formatSteamId(user.steamid);
         if (steamId) {
             const { success, players } : ApiResponse = await getStatsBySteamId(steamId);
             if (success) interaction.reply({ embeds: [await getStatsTemplate(players as Player)] })
